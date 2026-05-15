@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tomorrow's Diagnostic Test 📋</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fef9f0;
+    --card: #ffffff;
+    --border: #e8e0d5;
+    --text: #2d2416;
+    --sub: #8a7f72;
+    --accent1: #e85d04;
+    --accent2: #dc2f02;
+    --accent3: #f48c06;
+    --accent4: #370617;
+    --green: #2d6a4f;
+    --red: #ae2012;
+    --blue: #1d3557;
+    --purple: #7b2d8b;
+    --teal: #0a7c6a;
+    --radius: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* warm paper texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='400' height='400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 24px 16px 80px;
+  }
+
+  /* ── SCREENS ── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── COVER ── */
+  .cover {
+    text-align: center;
+    padding: 40px 20px;
+  }
+  .cover-icon { font-size: 4rem; margin-bottom: 12px; display: block; }
+  .cover h1 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 2.6rem;
+    color: var(--accent1);
+    line-height: 1.1;
+  }
+  .cover .subtitle {
+    color: var(--sub);
+    font-size: 1rem;
+    margin: 10px 0 30px;
+    font-weight: 500;
+    line-height: 1.6;
+  }
+
+  .topic-preview {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 24px 0 32px;
+    text-align: left;
+  }
+  .topic-chip {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 0.92rem;
+  }
+  .topic-chip .icon { font-size: 1.4rem; }
+  .topic-chip.new { border-color: var(--accent3); background: #fff8ee; }
+  .topic-chip.revision { border-color: #7b2d8b44; background: #f9f0fc; }
+  .chip-label { font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 50px; margin-left: auto; }
+  .chip-label.new { background: #fff0cc; color: var(--accent1); }
+  .chip-label.rev { background: #f0e4f7; color: var(--purple); }
+
+  /* ── PROGRESS BAR ── */
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .progress-label { font-weight: 700; font-size: 0.85rem; color: var(--sub); }
+  .progress-bar {
+    height: 8px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent1), var(--accent3));
+    border-radius: 99px;
+    transition: width 0.5s ease;
+  }
+
+  /* ── SECTION DIVIDER ── */
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 8px 0 16px;
+    animation: fadeUp 0.4s ease;
+  }
+  .section-pill {
+    padding: 6px 16px;
+    border-radius: 50px;
+    font-family: 'Baloo 2', cursive;
+    font-size: 0.95rem;
+    font-weight: 700;
+    white-space: nowrap;
+    color: white;
+  }
+  .pill-new { background: var(--accent1); }
+  .pill-revision { background: var(--purple); }
+  .divider-line { flex: 1; height: 1.5px; background: var(--border); }
+
+  /* ── QUESTION CARD ── */
+  .q-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 22px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    animation: fadeUp 0.4s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .q-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    border-radius: 4px 0 0 4px;
+  }
+  .q-card.new-topic::before { background: var(--accent1); }
+  .q-card.revision-topic::before { background: var(--purple); }
+
+  .q-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .q-num {
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--accent1);
+    line-height: 1;
+    min-width: 28px;
+  }
+  .q-revision .q-num { color: var(--purple); }
+
+  .q-topic-tag {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 50px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  .tag-new { background: #fff0cc; color: var(--accent1); }
+  .tag-rev { background: #f0e4f7; color: var(--purple); }
+
+  .q-scenario {
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.88rem;
+    color: var(--sub);
+    line-height: 1.6;
+    margin-bottom: 12px;
+    border: 1px solid var(--border);
+    font-style: italic;
+  }
+
+  .q-text {
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+
+  /* answer area */
+  .answer-area {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .answer-input {
+    flex: 1;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    background: var(--bg);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .answer-input:focus { border-color: var(--accent1); background: white; }
+  .answer-input.correct { border-color: var(--green); background: #f0fff4; color: var(--green); }
+  .answer-input.wrong { border-color: var(--red); background: #fff5f5; color: var(--red); }
+  .answer-input:disabled { opacity: 0.8; }
+
+  .hint-btn {
+    background: #fff8ee;
+    border: 1.5px solid var(--accent3);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--accent1);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .hint-btn:hover { background: #ffeecc; }
+
+  .check-btn {
+    background: var(--accent1);
+    border: none;
+    border-radius: 10px;
+    padding: 11px 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .check-btn:hover { background: var(--accent2); transform: translateY(-1px); }
+  .check-btn:active { transform: scale(0.97); }
+
+  /* hint box */
+  .hint-box {
+    margin-top: 12px;
+    background: #fff8ee;
+    border: 1px solid #f9c74f80;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.88rem;
+    color: #7a5c00;
+    font-weight: 600;
+    display: none;
+  }
+  .hint-box.show { display: block; }
+
+  /* feedback */
+  .q-feedback {
+    margin-top: 14px;
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: none;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+  .q-feedback.show { display: block; }
+  .q-feedback.correct-fb { background: #f0fff4; border: 1.5px solid #2d6a4f40; }
+  .q-feedback.wrong-fb { background: #fff5f5; border: 1.5px solid #ae201240; }
+  .fb-title { font-weight: 800; font-size: 0.95rem; margin-bottom: 6px; }
+  .correct-fb .fb-title { color: var(--green); }
+  .wrong-fb .fb-title { color: var(--red); }
+  .fb-body { color: var(--sub); }
+  .fb-body strong { color: var(--text); }
+  .fb-steps { margin-top: 8px; display: flex; flex-direction: column; gap: 3px; }
+  .fb-step {
+    font-size: 0.85rem;
+    border-left: 2px solid var(--accent3);
+    padding-left: 10px;
+    color: var(--sub);
+  }
+  .fb-step strong { color: var(--accent1); }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-block;
+    padding: 14px 28px;
+    border-radius: 12px;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary {
+    background: var(--accent1);
+    color: white;
+    width: 100%;
+    font-size: 1.05rem;
+    padding: 16px;
+    margin-top: 8px;
+  }
+  .btn-primary:hover { background: var(--accent2); }
+  .btn-next {
+    background: var(--green);
+    color: white;
+    width: 100%;
+    margin-top: 16px;
+    padding: 14px;
+  }
+  .btn-results {
+    background: var(--accent4);
+    color: white;
+    width: 100%;
+    margin-top: 20px;
+    padding: 16px;
+    font-size: 1.05rem;
+  }
+
+  /* ── RESULTS ── */
+  .results-header {
+    text-align: center;
+    padding: 32px 0 24px;
+  }
+  .results-header h2 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 2.2rem;
+    color: var(--accent1);
+  }
+  .results-header p { color: var(--sub); font-size: 1rem; margin-top: 6px; }
+
+  .score-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 20px 0;
+  }
+  .score-card {
+    border-radius: var(--radius);
+    padding: 18px 16px;
+    text-align: center;
+    border: 1.5px solid var(--border);
+  }
+  .score-card .score-num {
+    font-family: 'Baloo 2', cursive;
+    font-size: 2.4rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .score-card .score-label { font-size: 0.82rem; font-weight: 600; color: var(--sub); }
+  .card-total { background: var(--card); }
+  .card-total .score-num { color: var(--accent1); }
+  .card-correct { background: #f0fff4; border-color: #2d6a4f40; }
+  .card-correct .score-num { color: var(--green); }
+  .card-wrong { background: #fff5f5; border-color: #ae201240; }
+  .card-wrong .score-num { color: var(--red); }
+  .card-hints { background: #fff8ee; border-color: #f9c74f60; }
+  .card-hints .score-num { color: var(--accent3); }
+
+  /* topic breakdown */
+  .breakdown {
+    margin: 24px 0;
+  }
+  .breakdown h3 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+  .topic-result {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 8px;
+  }
+  .topic-result .t-icon { font-size: 1.4rem; }
+  .topic-result .t-name { font-weight: 700; font-size: 0.95rem; flex: 1; }
+  .topic-result .t-tag { font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 50px; }
+  .tag-strong { background: #d8f3dc; color: var(--green); }
+  .tag-good { background: #fff0b3; color: #7a5c00; }
+  .tag-practice { background: #ffe8d6; color: #7a2e00; }
+  .tag-focus { background: #ffcccc; color: var(--red); }
+
+  .t-bar { width: 80px; height: 8px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .t-bar-fill { height: 100%; border-radius: 99px; transition: width 0.8s ease; }
+  .fill-green { background: var(--green); }
+  .fill-yellow { background: var(--accent3); }
+  .fill-orange { background: var(--accent1); }
+  .fill-red { background: var(--red); }
+
+  /* plan section */
+  .plan-section {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin: 16px 0;
+  }
+  .plan-section h3 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.2rem;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .plan-item {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .plan-item:last-child { border-bottom: none; }
+  .plan-icon { font-size: 1.2rem; margin-top: 1px; }
+  .plan-text { font-size: 0.9rem; line-height: 1.5; color: var(--sub); }
+  .plan-text strong { color: var(--text); }
+
+  .btn-play-game {
+    background: linear-gradient(135deg, var(--accent1), var(--accent3));
+    color: white;
+    width: 100%;
+    margin-top: 8px;
+    padding: 16px;
+    font-size: 1.1rem;
+    border-radius: 14px;
+  }
+
+  @media (max-width: 500px) {
+    .cover h1 { font-size: 2rem; }
+    .topic-preview { grid-template-columns: 1fr; }
+    .score-grid { grid-template-columns: 1fr 1fr; }
+    .answer-area { flex-wrap: wrap; }
+    .hint-btn, .check-btn { flex: 1; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- ── SCREEN 1: COVER ── -->
+  <div class="screen active" id="screen-cover">
+    <div class="cover">
+      <span class="cover-icon">📋</span>
+      <h1>Tomorrow's Diagnostic Test</h1>
+      <p class="subtitle">
+        Let's find out exactly where you are on four new topics<br>
+        and check in on the ones from today.<br>
+        <strong>No pressure — this helps us help you!</strong>
+      </p>
+
+      <div class="topic-preview">
+        <div class="topic-chip new">
+          <span class="icon">🌡️</span>
+          <div>
+            <div>Negative Numbers</div>
+            <div style="font-size:0.75rem;color:var(--sub);font-weight:500">New topic</div>
+          </div>
+          <span class="chip-label new">NEW</span>
+        </div>
+        <div class="topic-chip new">
+          <span class="icon">📦</span>
+          <div>
+            <div>Volume</div>
+            <div style="font-size:0.75rem;color:var(--sub);font-weight:500">New topic</div>
+          </div>
+          <span class="chip-label new">NEW</span>
+        </div>
+        <div class="topic-chip new">
+          <span class="icon">🎯</span>
+          <div>
+            <div>Decimals</div>
+            <div style="font-size:0.75rem;color:var(--sub);font-weight:500">New topic</div>
+          </div>
+          <span class="chip-label new">NEW</span>
+        </div>
+        <div class="topic-chip new">
+          <span class="icon">🎲</span>
+          <div>
+            <div>Probability</div>
+            <div style="font-size:0.75rem;color:var(--sub);font-weight:500">New topic</div>
+          </div>
+          <span class="chip-label new">NEW</span>
+        </div>
+        <div class="topic-chip revision">
+          <span class="icon">💰</span>
+          <div>
+            <div>Percentages</div>
+            <div style="font-size:0.75rem;color:var(--sub);font-weight:500">Revision</div>
+          </div>
+          <span class="chip-label rev">REVISE</span>
+        </div>
+        <div class="topic-chip revision">
+          <span class="icon">⚖️</span>
+          <div>
+            <div>Ratio</div>
+            <div style="font-size:0.75rem;color:var(--sub);font-weight:500">Revision</div>
+          </div>
+          <span class="chip-label rev">REVISE</span>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="startTest()">Start Diagnostic Test →</button>
+    </div>
+  </div>
+
+  <!-- ── SCREEN 2: TEST ── -->
+  <div class="screen" id="screen-test">
+    <div class="progress-header">
+      <span class="progress-label" id="progress-label">Question 1 of 18</span>
+      <span class="progress-label" id="score-label">✓ 0 correct</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+
+    <div id="question-container"></div>
+
+    <button class="btn btn-next" id="next-btn" style="display:none" onclick="nextQuestion()">Next Question →</button>
+    <button class="btn btn-results" id="results-btn" style="display:none" onclick="showResults()">See My Results 📊</button>
+  </div>
+
+  <!-- ── SCREEN 3: RESULTS ── -->
+  <div class="screen" id="screen-results">
+    <div class="results-header">
+      <h2>📊 Diagnostic Results</h2>
+      <p>Here's a full picture of where you are today</p>
+    </div>
+
+    <div class="score-grid">
+      <div class="score-card card-total">
+        <div class="score-num" id="res-total">0/18</div>
+        <div class="score-label">Total Score</div>
+      </div>
+      <div class="score-card card-correct">
+        <div class="score-num" id="res-correct">0</div>
+        <div class="score-label">Correct ✓</div>
+      </div>
+      <div class="score-card card-wrong">
+        <div class="score-num" id="res-wrong">0</div>
+        <div class="score-label">To Practise</div>
+      </div>
+      <div class="score-card card-hints">
+        <div class="score-num" id="res-hints">0</div>
+        <div class="score-label">Hints Used</div>
+      </div>
+    </div>
+
+    <div class="breakdown">
+      <h3>Topic by Topic</h3>
+      <div id="topic-breakdown"></div>
+    </div>
+
+    <div class="plan-section" id="plan-section">
+      <h3>📅 Tomorrow's Plan</h3>
+      <div id="plan-items"></div>
+    </div>
+
+    <button class="btn btn-play-game" onclick="location.reload()">🔄 Try Again</button>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+  // ── NEW: NEGATIVE NUMBERS ──
+  {
+    id: 'neg1', topic: 'negative', topicName: 'Negative Numbers', isNew: true,
+    icon: '🌡️',
+    scenario: '🌡️ During a cold week in Russia, the temperature on Monday was −8°C. By Friday it had risen to 5°C.',
+    question: 'What is the difference in temperature between Monday and Friday?',
+    hint: 'On a number line, count from −8 up to 5. How many steps is that?',
+    answers: ['13', '13°c', '13 degrees', '13°'],
+    explanation: 'Count from −8 to 0 (that\'s 8 steps), then from 0 to 5 (5 more steps). Total = 8 + 5 = 13°C.',
+    steps: ['−8 → 0 = <strong>8 steps</strong>', '0 → 5 = <strong>5 steps</strong>', 'Difference = 8 + 5 = <strong>13°C</strong>']
+  },
+  {
+    id: 'neg2', topic: 'negative', topicName: 'Negative Numbers', isNew: true,
+    icon: '🏔️',
+    scenario: '🏔️ In a maths game, you start on level −3. You climb up 7 levels.',
+    question: 'What level are you on now?',
+    hint: 'Start at −3 and add 7. Cross through zero on the number line.',
+    answers: ['4', 'level 4', '+4'],
+    explanation: 'Starting at −3, add 7: −3 + 7 = 4. You cross zero and land on level 4.',
+    steps: ['−3 + 7', '−3 + 3 = <strong>0</strong>', '0 + 4 = <strong>4</strong>']
+  },
+  {
+    id: 'neg3', topic: 'negative', topicName: 'Negative Numbers', isNew: true,
+    icon: '❄️',
+    scenario: '❄️ Order these temperatures from coldest to warmest.',
+    question: 'Put in order coldest to warmest: −5, 3, −12, 0, 7, −1',
+    hint: 'The most negative number is the coldest. Which number is furthest below zero?',
+    answers: ['−12, −5, −1, 0, 3, 7', '-12, -5, -1, 0, 3, 7', '−12 −5 −1 0 3 7'],
+    explanation: 'On a number line, numbers get warmer as they move right. The most negative is the coldest.',
+    steps: ['Most negative (coldest) = <strong>−12</strong>', 'Then: <strong>−5, −1, 0, 3, 7</strong>']
+  },
+
+  // ── NEW: VOLUME ──
+  {
+    id: 'vol1', topic: 'volume', topicName: 'Volume', isNew: true,
+    icon: '📦',
+    scenario: '📦 You\'re designing a storage box for your gymnastics equipment. The box is 5cm long, 4cm wide and 3cm tall.',
+    question: 'What is the volume of the box? (include the unit)',
+    hint: 'Volume of a cuboid = length × width × height. Multiply all three measurements.',
+    answers: ['60cm³', '60 cm³', '60cm3', '60 cm3', '60'],
+    explanation: 'Volume = length × width × height = 5 × 4 × 3 = 60 cm³.',
+    steps: ['Volume = length × width × height', '= 5 × 4 × 3', '= 20 × 3 = <strong>60 cm³</strong>']
+  },
+  {
+    id: 'vol2', topic: 'volume', topicName: 'Volume', isNew: true,
+    icon: '🍰',
+    scenario: '🍰 You\'re baking a rectangular cake. The tin is 20cm long, 15cm wide and 8cm deep.',
+    question: 'What is the volume of cake mixture the tin can hold?',
+    hint: 'Volume = l × w × h. Work out 20 × 15 first, then × 8.',
+    answers: ['2400cm³', '2400 cm³', '2400cm3', '2400'],
+    explanation: 'Volume = 20 × 15 × 8. Start: 20 × 15 = 300. Then 300 × 8 = 2400 cm³.',
+    steps: ['20 × 15 = <strong>300</strong>', '300 × 8 = <strong>2400 cm³</strong>']
+  },
+  {
+    id: 'vol3', topic: 'volume', topicName: 'Volume', isNew: true,
+    icon: '🤖',
+    scenario: '🤖 You\'re building a rectangular case for your AI robot project. The volume must be 120 cm³. The base is 6cm × 5cm.',
+    question: 'How tall must the case be?',
+    hint: 'Volume = l × w × h, so h = volume ÷ (l × w). Find the base area first.',
+    answers: ['4', '4cm', '4 cm'],
+    explanation: 'Base area = 6 × 5 = 30 cm². Height = volume ÷ base area = 120 ÷ 30 = 4 cm.',
+    steps: ['Base area = 6 × 5 = <strong>30 cm²</strong>', 'Height = 120 ÷ 30 = <strong>4 cm</strong>']
+  },
+
+  // ── NEW: DECIMALS ──
+  {
+    id: 'dec1', topic: 'decimals', topicName: 'Decimals', isNew: true,
+    icon: '🎯',
+    scenario: '🎯 In an art competition, four students got these scores: 7.4, 7.38, 7.9, 7.05.',
+    question: 'Write the scores in order from smallest to largest.',
+    hint: 'Compare the tenths digit first. If tenths are equal, compare hundredths.',
+    answers: ['7.05, 7.38, 7.4, 7.9', '7.05 7.38 7.4 7.9'],
+    explanation: 'Look at each decimal place in turn. 7.05 has 0 tenths, so it\'s smallest. 7.38 < 7.4 < 7.9.',
+    steps: ['Tenths: 7.0_, 7.3_, 7.4, 7.9', '7.05 has 0 tenths → smallest', 'Order: <strong>7.05, 7.38, 7.4, 7.9</strong>']
+  },
+  {
+    id: 'dec2', topic: 'decimals', topicName: 'Decimals', isNew: true,
+    icon: '🏀',
+    scenario: '🏀 In basketball training, you ran 3.75km on Monday and 2.8km on Tuesday.',
+    question: 'How far did you run in total?',
+    hint: 'Line up the decimal points when adding. 3.75 + 2.80 — remember to add the zero.',
+    answers: ['6.55', '6.55km', '6.55 km'],
+    explanation: 'Line up decimal points: 3.75 + 2.80 = 6.55. Always line up decimal points when adding.',
+    steps: ['3.75', '+ 2.80 (add a zero as placeholder)', '= <strong>6.55 km</strong>']
+  },
+  {
+    id: 'dec3', topic: 'decimals', topicName: 'Decimals', isNew: true,
+    icon: '🍪',
+    scenario: '🍪 A recipe needs 1.6kg of flour. You multiply all ingredients by 10 to bake for a big party.',
+    question: 'How much flour do you need now?',
+    hint: 'Multiplying by 10 moves every digit one place to the LEFT (the number gets bigger).',
+    answers: ['16', '16kg', '16 kg'],
+    explanation: 'When multiplying by 10, every digit moves one place to the left. 1.6 × 10 = 16.',
+    steps: ['1.6 × 10: digits move one place left', '1.6 → <strong>16</strong>', '(the decimal point moves right)']
+  },
+
+  // ── NEW: PROBABILITY ──
+  {
+    id: 'prob1', topic: 'probability', topicName: 'Probability', isNew: true,
+    icon: '🎲',
+    scenario: '🎲 You have a bag of 10 marbles: 4 red, 3 blue and 3 green. You pick one without looking.',
+    question: 'What is the probability of picking a red marble? Write as a fraction.',
+    hint: 'Probability = number of ways it can happen ÷ total number of outcomes.',
+    answers: ['4/10', '2/5'],
+    explanation: 'There are 4 red marbles out of 10 total. Probability = 4/10 = 2/5.',
+    steps: ['Probability = <strong>favourable outcomes ÷ total outcomes</strong>', '= 4 ÷ 10 = <strong>4/10</strong>', 'Simplified = <strong>2/5</strong>']
+  },
+  {
+    id: 'prob2', topic: 'probability', topicName: 'Probability', isNew: true,
+    icon: '🤸',
+    scenario: '🤸 At gymnastics, the coach randomly picks which skill to practise from a list of 8. 3 are floor skills, 2 are beam skills and 3 are vault skills.',
+    question: 'What is the probability of NOT practising a vault skill? Write as a fraction.',
+    hint: 'All probabilities add up to 1. Find the probability of vault first, then subtract from 1.',
+    answers: ['5/8'],
+    explanation: 'Vault probability = 3/8. Not vault = 1 − 3/8 = 5/8.',
+    steps: ['P(vault) = 3/8', 'P(not vault) = 1 − 3/8 = <strong>5/8</strong>']
+  },
+  {
+    id: 'prob3', topic: 'probability', topicName: 'Probability', isNew: true,
+    icon: '🎨',
+    scenario: '🎨 You spin a colour wheel that has 5 equal sections: 2 pink, 1 yellow, 1 blue, 1 green.',
+    question: 'What is the probability of landing on pink? Write as a fraction in its simplest form.',
+    hint: 'How many pink sections are there? How many sections total?',
+    answers: ['2/5'],
+    explanation: '2 pink sections out of 5 total. 2/5 is already in its simplest form.',
+    steps: ['P(pink) = 2 ÷ 5 = <strong>2/5</strong>', '2/5 is already simplified (HCF of 2 and 5 is 1)']
+  },
+
+  // ── REVISION: PERCENTAGES ──
+  {
+    id: 'pct1', topic: 'percentages', topicName: 'Percentages', isNew: false,
+    icon: '💰',
+    scenario: '💰 You\'re saving up for a new drawing tablet. It costs £160 and is reduced by 30% in a sale.',
+    question: 'What is the sale price?',
+    hint: '10% of £160 = £16. Build 30% from that, then subtract from £160.',
+    answers: ['112', '£112', '£112.00'],
+    explanation: '30% of £160 = £48. Sale price = £160 − £48 = £112.',
+    steps: ['10% of £160 = <strong>£16</strong>', '30% = £16 × 3 = <strong>£48</strong>', 'Sale price = £160 − £48 = <strong>£112</strong>']
+  },
+  {
+    id: 'pct2', topic: 'percentages', topicName: 'Percentages', isNew: false,
+    icon: '🏀',
+    scenario: '🏀 In a basketball match, your team attempted 80 shots and scored 45% of them.',
+    question: 'How many shots did your team score?',
+    hint: 'Divide 80 by 100 to get 1%, then multiply by 45.',
+    answers: ['36', '36 shots'],
+    explanation: '1% of 80 = 0.8. 45% = 0.8 × 45 = 36 shots.',
+    steps: ['1% of 80 = 80 ÷ 100 = <strong>0.8</strong>', '45% = 0.8 × 45 = <strong>36 shots</strong>']
+  },
+
+  // ── REVISION: RATIO ──
+  {
+    id: 'rat1', topic: 'ratio', topicName: 'Ratio', isNew: false,
+    icon: '⚖️',
+    scenario: '🍰 A frosting recipe mixes cream cheese and butter in the ratio 5:2. You have 350g of cream cheese.',
+    question: 'How much butter do you need?',
+    hint: 'If 5 parts = 350g, what is 1 part? Then multiply by 2.',
+    answers: ['140', '140g', '140 g'],
+    explanation: '5 parts = 350g, so 1 part = 70g. Butter = 2 parts = 140g.',
+    steps: ['1 part = 350 ÷ 5 = <strong>70g</strong>', 'Butter = 2 × 70 = <strong>140g</strong>']
+  },
+  {
+    id: 'rat2', topic: 'ratio', topicName: 'Ratio', isNew: false,
+    icon: '🤸',
+    scenario: '🤸 Three gymnasts share practice time in the ratio 2:3:5. Total practice is 200 minutes.',
+    question: 'How many minutes does the gymnast with the largest share get?',
+    hint: 'Add all three ratio numbers. Divide 200 by that total to find 1 part. Multiply by 5.',
+    answers: ['100', '100 minutes', '100 mins'],
+    explanation: 'Total parts = 10. One part = 20 mins. Largest share = 5 × 20 = 100 minutes.',
+    steps: ['Total parts: 2+3+5 = <strong>10</strong>', '1 part = 200 ÷ 10 = <strong>20 mins</strong>', 'Largest = 5 × 20 = <strong>100 minutes</strong>']
+  }
+];
+
+// ── STATE ──
+let state = {
+  current: 0,
+  correct: 0,
+  hints: 0,
+  hintUsed: false,
+  answered: false,
+  results: {} // topic → {correct, total}
+};
+
+// init topic results
+['negative','volume','decimals','probability','percentages','ratio'].forEach(t => {
+  state.results[t] = { correct: 0, total: 0 };
+});
+
+function startTest() {
+  document.getElementById('screen-cover').classList.remove('active');
+  document.getElementById('screen-test').classList.add('active');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[state.current];
+  state.hintUsed = false;
+  state.answered = false;
+
+  // progress
+  const pct = (state.current / QUESTIONS.length) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = `Question ${state.current + 1} of ${QUESTIONS.length}`;
+  document.getElementById('score-label').textContent = `✓ ${state.correct} correct`;
+
+  // section divider
+  let dividerHTML = '';
+  const prev = state.current > 0 ? QUESTIONS[state.current - 1] : null;
+  if (!prev || prev.topic !== q.topic) {
+    const isNew = q.isNew;
+    dividerHTML = `
+      <div class="section-divider">
+        <span class="section-pill ${isNew ? 'pill-new' : 'pill-revision'}">${q.icon} ${q.topicName}</span>
+        <div class="divider-line"></div>
+        <span style="font-size:0.75rem;font-weight:700;color:var(--sub)">${isNew ? 'NEW TOPIC' : 'REVISION'}</span>
+      </div>`;
+  }
+
+  const cardClass = q.isNew ? 'new-topic' : 'revision-topic';
+  const tagClass = q.isNew ? 'tag-new' : 'tag-rev';
+  const tagText = q.isNew ? 'NEW' : 'REVISE';
+
+  document.getElementById('question-container').innerHTML = `
+    ${dividerHTML}
+    <div class="q-card ${cardClass}">
+      <div class="q-header">
+        <div class="q-num">${state.current + 1}.</div>
+        <div style="flex:1">
+          <div class="q-topic-tag ${tagClass}">${tagText} · ${q.topicName}</div>
+        </div>
+      </div>
+      <div class="q-scenario">${q.scenario}</div>
+      <div class="q-text">${q.question}</div>
+      <div class="hint-box" id="hint-box">💡 ${q.hint}</div>
+      <div class="answer-area">
+        <input type="text" class="answer-input" id="ans-input" placeholder="Your answer…" />
+        <button class="hint-btn" onclick="showHint()">💡 Hint</button>
+        <button class="check-btn" onclick="checkAnswer()">Check ✓</button>
+      </div>
+      <div class="q-feedback" id="q-feedback">
+        <div class="fb-title" id="fb-title"></div>
+        <div class="fb-body" id="fb-body"></div>
+        <div class="fb-steps" id="fb-steps"></div>
+      </div>
+    </div>`;
+
+  document.getElementById('next-btn').style.display = 'none';
+  document.getElementById('results-btn').style.display = 'none';
+
+  setTimeout(() => {
+    const inp = document.getElementById('ans-input');
+    if (inp) inp.focus();
+  }, 100);
+
+  document.getElementById('ans-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') checkAnswer();
+  });
+}
+
+function showHint() {
+  state.hintUsed = true;
+  document.getElementById('hint-box').classList.add('show');
+}
+
+function normalise(s) {
+  return s.toLowerCase().replace(/[£°\s,]/g, '').trim();
+}
+
+function checkAnswer() {
+  if (state.answered) return;
+  const q = QUESTIONS[state.current];
+  const raw = document.getElementById('ans-input').value.trim();
+  if (!raw) return;
+
+  state.answered = true;
+  if (state.hintUsed) state.hints++;
+  state.results[q.topic].total++;
+
+  const correct = q.answers.some(a => normalise(a) === normalise(raw));
+  const input = document.getElementById('ans-input');
+  const fb = document.getElementById('q-feedback');
+
+  input.disabled = true;
+
+  if (correct) {
+    state.correct++;
+    state.results[q.topic].correct++;
+    input.classList.add('correct');
+    fb.className = 'q-feedback correct-fb show';
+    document.getElementById('fb-title').textContent = '🎉 Correct! Well done!';
+    document.getElementById('fb-body').innerHTML = q.explanation;
+    document.getElementById('fb-steps').innerHTML = '';
+  } else {
+    input.classList.add('wrong');
+    fb.className = 'q-feedback wrong-fb show';
+    document.getElementById('fb-title').textContent = `❌ The answer is: ${q.answers[0]}`;
+    document.getElementById('fb-body').innerHTML = q.explanation;
+    const stepsEl = document.getElementById('fb-steps');
+    stepsEl.innerHTML = '<br><strong style="color:var(--accent1)">Step by step:</strong>';
+    q.steps.forEach(s => {
+      const d = document.createElement('div');
+      d.className = 'fb-step';
+      d.innerHTML = s;
+      stepsEl.appendChild(d);
+    });
+  }
+
+  document.getElementById('score-label').textContent = `✓ ${state.correct} correct`;
+
+  if (state.current + 1 < QUESTIONS.length) {
+    document.getElementById('next-btn').style.display = 'block';
+  } else {
+    document.getElementById('results-btn').style.display = 'block';
+  }
+}
+
+function nextQuestion() {
+  state.current++;
+  renderQuestion();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showResults() {
+  document.getElementById('screen-test').classList.remove('active');
+  document.getElementById('screen-results').classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  document.getElementById('res-total').textContent = `${state.correct}/${QUESTIONS.length}`;
+  document.getElementById('res-correct').textContent = state.correct;
+  document.getElementById('res-wrong').textContent = QUESTIONS.length - state.correct;
+  document.getElementById('res-hints').textContent = state.hints;
+
+  // Topic breakdown
+  const topicMeta = {
+    negative:    { name: 'Negative Numbers', icon: '🌡️', isNew: true },
+    volume:      { name: 'Volume',            icon: '📦', isNew: true },
+    decimals:    { name: 'Decimals',          icon: '🎯', isNew: true },
+    probability: { name: 'Probability',       icon: '🎲', isNew: true },
+    percentages: { name: 'Percentages',       icon: '💰', isNew: false },
+    ratio:       { name: 'Ratio',             icon: '⚖️', isNew: false }
+  };
+
+  const breakdownEl = document.getElementById('topic-breakdown');
+  breakdownEl.innerHTML = '';
+  const planItems = [];
+
+  Object.entries(state.results).forEach(([topic, data]) => {
+    const meta = topicMeta[topic];
+    const pct = data.total > 0 ? Math.round((data.correct / data.total) * 100) : 0;
+    let tag, tagClass, fillClass, planMsg;
+
+    if (pct === 100) {
+      tag = '⭐ Strong'; tagClass = 'tag-strong'; fillClass = 'fill-green';
+      planMsg = null;
+    } else if (pct >= 67) {
+      tag = '👍 Good'; tagClass = 'tag-good'; fillClass = 'fill-yellow';
+      planMsg = { icon: '📝', text: `<strong>${meta.name}</strong> — Nearly there! A few more practice questions to lock it in.` };
+    } else if (pct >= 34) {
+      tag = '📚 Practise'; tagClass = 'tag-practice'; fillClass = 'fill-orange';
+      planMsg = { icon: '🎯', text: `<strong>${meta.name}</strong> — Needs focused practice. We'll do a mini-lesson and then drills.` };
+    } else {
+      tag = '🎯 Focus'; tagClass = 'tag-focus'; fillClass = 'fill-red';
+      planMsg = { icon: '💡', text: `<strong>${meta.name}</strong> — Let's build this from scratch with real-world examples. ${meta.isNew ? 'Brand new topic — no worries!' : 'We\'ll revisit the key concepts.'}` };
+    }
+
+    if (planMsg) planItems.push(planMsg);
+
+    breakdownEl.innerHTML += `
+      <div class="topic-result">
+        <span class="t-icon">${meta.icon}</span>
+        <span class="t-name">${meta.name} <span style="font-size:0.75rem;color:var(--sub);font-weight:500">${meta.isNew ? '(new)' : '(revision)'}</span></span>
+        <div class="t-bar"><div class="t-bar-fill ${fillClass}" style="width:${pct}%"></div></div>
+        <span class="t-tag ${tagClass}">${tag}</span>
+      </div>`;
+  });
+
+  // Plan
+  const planEl = document.getElementById('plan-items');
+  if (planItems.length === 0) {
+    planEl.innerHTML = '<div class="plan-item"><span class="plan-icon">🌟</span><span class="plan-text"><strong>Incredible — all topics strong!</strong> Tomorrow we can go deeper with stretch challenges.</span></div>';
+  } else {
+    planItems.forEach(p => {
+      planEl.innerHTML += `<div class="plan-item"><span class="plan-icon">${p.icon}</span><span class="plan-text">${p.text}</span></div>`;
+    });
+    planEl.innerHTML += `<div class="plan-item"><span class="plan-icon">🎮</span><span class="plan-text">After each topic: <strong>Maths Quest game</strong> for fun practice with cooking, basketball and gymnastics challenges!</span></div>`;
+  }
+
+  // Animate bars
+  setTimeout(() => {
+    document.querySelectorAll('.t-bar-fill').forEach(el => {
+      el.style.transition = 'width 0.8s ease';
+    });
+  }, 100);
+}
+</script>
+</body>
+</html>
